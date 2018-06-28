@@ -28,3 +28,7 @@ def timeit(method):
             print('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
         return result
     return timed
+
+
+def inverse_ohe(ohe_outputs, ohe_encoder):
+    return ohe_encoder.active_features_[ohe_outputs.argmax(axis=1)]
