@@ -1,6 +1,6 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, Convolution2D, MaxPooling2D, Flatten, LSTM
+from keras.layers import Dense, Activation, Dropout, Convolution2D, MaxPooling2D, Flatten, LSTM, BatchNormalization
 
 
 def build_deep_dense(n_features=193, n_classes=8):
@@ -9,9 +9,12 @@ def build_deep_dense(n_features=193, n_classes=8):
     model.add(Dense(400, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(1200, activation='relu'))
-    model.add(Dense(1200, activation='relu'))
     model.add(Dropout(0.5))
+    # model.add(BatchNormalization())
+    model.add(Dense(1200, activation='relu'))
+    model.add(Dropout(0.1))
     model.add(Dense(1400, activation='relu'))
+    # model.add(BatchNormalization())
     model.add(Dense(n_classes, activation='softmax'))
     return model
 
