@@ -1,6 +1,9 @@
 import keras
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout, Convolution2D, MaxPooling2D, Flatten, LSTM, BatchNormalization
+from keras.models import Sequential, Model
+from keras.layers import Dense, Activation, Dropout, \
+                         Convolution1D, Convolution2D, MaxPooling2D, \
+                         Flatten, LSTM, BatchNormalization, \
+                         Input, MaxPool1D, GlobalMaxPool1D
 
 
 def build_deep_dense(n_features=193, n_classes=8):
@@ -55,6 +58,37 @@ def build_conv_seq(input_shape, n_classes=8):
 
 def build_conv_spectre():
     pass
+
+
+def build_raw_1dconv_kaggle(input_length, n_classes=8):
+
+    inp = Input(shape=(input_length, 1))
+    x = Convolution1D(16, 9, activation='relu', padding="valid")(inp)
+    x = Convolution1D(16, 9, activation='relu', padding="valid")(x)
+    x = MaxPool1D(16)(x)
+    x = Dropout(rate=0.1)(x)
+
+    x = Convolution1D(32, 3, activation='relu', padding="valid")(x)
+    x = Convolution1D(32, 3, activation='relu', padding="valid")(x)
+    x = MaxPool1D(4)(x)
+    x = Dropout(rate=0.1)(x)
+
+    x = Convolution1D(32, 3, activation='relu', padding="valid")(x)
+    x = Convolution1D(32, 3, activation='relu', padding="valid")(x)
+    x = MaxPool1D(4)(x)
+    x = Dropout(rate=0.1)(x)
+
+    x = Convolution1D(256, 3, activation='relu', padding="valid")(x)
+    x = Convolution1D(256, 3, activation='relu', padding="valid")(x)
+    x = GlobalMaxPool1D()(x)
+    x = Dropout(rate=0.2)(x)
+
+    x = Dense(64, activation='relu')(x)
+    x = Dense(1028, activation='relu')(x)
+    out = Dense(n_classes, activation='softmax')(x)
+
+    model = Model(inputs=inp, outputs=out)
+    return model
 
 
 def build_lstm_seq(timesteps=20, data_dim=41, n_classes=8):

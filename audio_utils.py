@@ -73,6 +73,34 @@ def seq_features(fn, bands=20, frames=41):
     return np.array(features)
 
 
+def conv1d_extractor(file_name, **extractor_args):
+    data, _ = librosa.core.load(file_name, sr=extractor_args['sr'],
+                                res_type='kaiser_fast')
+    # Random offset / Padding
+    input_length = extractor_args['input_length']
+    if len(data) > input_length:
+        max_offset = len(data) - input_length
+        offset = np.random.randint(max_offset)
+        data = data[offset:(input_length + offset)]
+    else:
+        if input_length > len(data):
+            max_offset = input_length - len(data)
+            offset = np.random.randint(max_offset)
+        else:
+            offset = 0
+        data = np.pad(data, (offset, input_length - len(data) - offset), "constant")
+
+    def audio_norm(data):
+        max_data = np.max(data)
+        min_data = np.min(data)
+        data = (data - min_data) / (max_data - min_data + 1e-6)
+        return data - 0.5
+    # data = librosa.feature.mfcc(data, sr=extractor_args['sr'], n_mfcc=extractor_args['n_mfcc'])
+    data = audio_norm(data)
+    data = np.expand_dims(data, axis=-1)
+    return data
+
+
 if __name__ == '__main__':
     pass
     # from dataset import audiodata
